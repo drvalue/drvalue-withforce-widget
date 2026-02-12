@@ -14,7 +14,9 @@
 
   // ===== 설정/기본값 =====
   var cfg = window.MyChatbotWidget || {};
-  var botUrl = cfg.url || "https://workspace.growxd.com/withforce/chat/home";
+  var botUrl =
+    cfg.url ||
+    "https://workspace.growxd.com/withforce/sign/in?redirect=/chat/home";
 
   // postMessage 허용 origin (보안 필수)
   // - 기본: botUrl origin만 허용
