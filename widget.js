@@ -34,7 +34,7 @@
 
   // 위치 제어용 상태 (기본: 오른쪽-하단 20px)
   var anchor = {
-    x: (cfg.anchor && cfg.anchor.x) || "right", // "left" | "right"
+    x: (cfg.anchor && cfg.anchor.x) || "left", // "left" | "right"
     y: (cfg.anchor && cfg.anchor.y) || "bottom", // "top" | "bottom"
   };
   var offset = {
@@ -43,7 +43,24 @@
   };
 
   // 버튼/패널 기본 크기
-  var baseSize = cfg.size || { width: 500, height: 720 };
+  // - width: 기존 기본 500 유지
+  // - height: (viewport 높이 - 300) 를 기본값으로 사용, 최소/최대는 적당히 클램프
+  function getDefaultDesktopHeight() {
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    // 기본: vh - 300, 너무 작아지지 않게 최소 480, 너무 커지지 않게 최대 vh - 40
+    var h = vh - 300;
+    var minH = 480;
+    var maxH = Math.max(minH, vh - 40);
+    return Math.max(minH, Math.min(h, maxH));
+  }
+
+  var baseSize = {
+    width: cfg.size && cfg.size.width != null ? cfg.size.width : 500,
+    height:
+      cfg.size && cfg.size.height != null
+        ? cfg.size.height
+        : getDefaultDesktopHeight(),
+  };
 
   // 데스크톱 패널 확장 상태 및 크기
   var isExpanded = false;
@@ -221,13 +238,13 @@
     el.style.left = el.style.right = el.style.top = el.style.bottom = "";
 
     // X축
-    if (anchor.x === "left") el.style.left = offset.x + "px";
-    else el.style.right = offset.x + "px";
+    if (anchor.x === "left") el.style.left = offset.x;
+    else el.style.right = offset.x;
 
     // Y축
     var oy = (offset.y || 0) + (extra.yLift || 0);
-    if (anchor.y === "top") el.style.top = oy + "px";
-    else el.style.bottom = oy + "px";
+    if (anchor.y === "top") el.style.top = oy;
+    else el.style.bottom = oy;
   }
 
   // 데스크탑 패널 우측 상단 확장/축소 버튼 위치
