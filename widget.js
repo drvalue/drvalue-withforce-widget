@@ -173,8 +173,8 @@
         display: block;
       }
 
-      .mycbw-btn .mycbw-btn-close { display: none !important; }
-      .mycbw-btn.open .mycbw-btn-close { display: flex; }
+      .mycbw-btn .mycbw-btn-close { display: none; }
+      .mycbw-btn.open .mycbw-btn-close { display: flex !important; }
 
       @media (max-width: 768px) {
         .mycbw-frame-wrap {
@@ -511,7 +511,7 @@
       background: "linear-gradient(116deg, #717BBC 50%, #3E4784 90%)",
       color: "white",
       fontSize: "20px",
-      display: "flex",
+      display: "none",
       alignItems: "center",
       justifyContent: "center",
       boxShadow: "0 2px 6px rgba(0,0,0,.2)",
