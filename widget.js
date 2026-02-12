@@ -431,6 +431,17 @@
     setTimeout(finish, 450);
   }
 
+  // ===== 외부에서 호출할 수 있게 API 노출 =====
+  window[FLAG].open = function () {
+    openPanel();
+  };
+  window[FLAG].close = function () {
+    closePanel();
+  };
+  window[FLAG].toggle = function () {
+    isOpen ? closePanel() : openPanel();
+  };
+
   // ===== 원격 설정(fetch) (선택) =====
   function fetchWidgetPosition() {
     // 사용자가 구현 안 했으면 조용히 무시
