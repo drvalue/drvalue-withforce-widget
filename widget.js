@@ -175,7 +175,7 @@
         display: block;
       }
 
-      .mycbw-btn .mycbw-btn-close { display: none; }
+      .mycbw-btn .mycbw-btn-close { display: none !important; }
       .mycbw-btn.open .mycbw-btn-close { display: flex; }
 
       @media (max-width: 768px) {
@@ -190,7 +190,7 @@
           border-radius: 0 !important; border: 0 !important;
           box-shadow: none !important;
         }
-        .mycbw-mob-close.open { display: block; }
+        .mycbw-mob-close.open { display: block !important; }
       }
 
       .mycbw-mob-close {
@@ -384,6 +384,10 @@
     if (isMobile()) {
       lockScrollMobile();
       mobClose.classList.add("open");
+      mobClose.style.display = "block";
+    } else {
+      mobClose.classList.remove("open");
+      mobClose.style.display = "none";
     }
 
     sendSession({ modal: true });
@@ -404,6 +408,7 @@
     // 모바일 스크롤 리셋
     unlockScrollMobile();
     mobClose.classList.remove("open");
+    mobClose.style.display = "none";
 
     // 닫힘 애니메이션
     frameEl.classList.add("closing");
@@ -532,6 +537,7 @@
       e.stopPropagation();
       closePanel();
     });
+    mobClose.style.display = "none";
     document.body.appendChild(mobClose);
 
     // 오버레이 (바깥 클릭 닫기)
@@ -629,9 +635,11 @@
         if (isOpen && isMobile()) {
           lockScrollMobile();
           mobClose.classList.add("open");
+          mobClose.style.display = "block";
         } else {
           unlockScrollMobile();
           mobClose.classList.remove("open");
+          mobClose.style.display = "none";
         }
       }, 200);
     });
