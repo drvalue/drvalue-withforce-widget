@@ -34,11 +34,11 @@
 
   // 위치 제어용 상태 (기본: 오른쪽-하단 20px)
   var anchor = {
-    x: (cfg.anchor && cfg.anchor.x) || "left", // "left" | "right"
+    x: (cfg.anchor && cfg.anchor.x) || "right", // "left" | "right"
     y: (cfg.anchor && cfg.anchor.y) || "bottom", // "top" | "bottom"
   };
   var offset = {
-    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "calc(100% - 5rem)",
+    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "5rem",
     y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : "10rem",
   };
 
@@ -232,19 +232,39 @@
   }
 
   // ===== 위치 적용 =====
+  function toCssLen(v) {
+    // number -> "px"
+    if (typeof v === "number") return v + "px";
+    // string -> 그대로 (예: "10rem", "calc(100% - 5rem)")
+    if (typeof v === "string") return v;
+    return null;
+  }
+
+  function applyYWithLift(base, liftPx) {
+    // base가 number면 더해서 px로
+    if (typeof base === "number") return base + liftPx + "px";
+    // base가 string이면 calc로 감싸서 더함 (liftPx는 항상 px)
+    if (typeof base === "string")
+      return "calc(" + base + " + " + liftPx + "px)";
+    // base 없으면 lift만
+    return liftPx + "px";
+  }
+
   function applyPositionTo(el, extra) {
     if (!el) return;
     extra = extra || { yLift: 0 };
     el.style.left = el.style.right = el.style.top = el.style.bottom = "";
 
     // X축
-    if (anchor.x === "left") el.style.left = offset.x;
-    else el.style.right = offset.x;
+    var xCss = toCssLen(offset.x);
+    if (anchor.x === "left") el.style.left = xCss || "20px";
+    else el.style.right = xCss || "20px";
 
     // Y축
-    var oy = (offset.y || 0) + (extra.yLift || 0);
-    if (anchor.y === "top") el.style.top = oy;
-    else el.style.bottom = oy;
+    var lift = extra.yLift || 0; // px로만 취급
+    var yCss = applyYWithLift(offset.y, lift);
+    if (anchor.y === "top") el.style.top = yCss;
+    else el.style.bottom = yCss;
   }
 
   // 데스크탑 패널 우측 상단 확장/축소 버튼 위치
@@ -271,9 +291,12 @@
 
   function updateWidgetPosition() {
     applyPositionTo(btn, { yLift: 0 });
-    // 버튼 위로 살짝 띄움: 기본 70, 확장 시 bottom ≈ 100이 되도록 보정
-    var iframeYOffset = !isExpanded ? 70 : 100 - (offset.y || 0);
-    applyPositionTo(frameEl, { yLift: iframeYOffset });
+
+    // yLift는 "항상 px 숫자"로만 다룬다.
+    // offset.y가 string이면 보정 계산(100 - offset.y)을 못하므로 그냥 70/100 고정 보정만 적용
+    var lift = isExpanded ? 100 : 70;
+    applyPositionTo(frameEl, { yLift: lift });
+
     updateExpandTogglePosition();
   }
 
