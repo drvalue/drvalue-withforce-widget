@@ -73,7 +73,7 @@
   };
 
   // ===== DOM refs =====
-  var btn, overlay, frameEl, mobClose, expandToggle;
+  var btn, overlay, frameEl, mobClose;
   var swallowNextBtnClick = false;
   var isOpen = false;
 
@@ -265,39 +265,6 @@
     else el.style.bottom = yCss;
   }
 
-  // 데스크탑 패널 우측 상단 확장/축소 버튼 위치
-  function updateExpandTogglePosition() {
-    if (!expandToggle || !frameWrapIsOpen()) return;
-
-    // 모바일은 숨김 유지
-    if (isMobile()) {
-      expandToggle.style.display = "none";
-      return;
-    }
-
-    // 패널(frameEl) 위치 기준으로 "패널 안쪽 우측 상단"에 붙이기
-    var rect = frameEl.getBoundingClientRect();
-
-    var inset = 0; // 패널 안쪽 여백(px)
-    var top = rect.top + inset;
-    var right =
-      (window.innerWidth || document.documentElement.clientWidth || 0) -
-      rect.right +
-      inset;
-
-    expandToggle.style.position = "fixed";
-    expandToggle.style.top = top + "px";
-    expandToggle.style.right = right + "px";
-    expandToggle.style.left = "auto";
-    expandToggle.style.bottom = "auto";
-
-    expandToggle.style.display = isOpen ? "flex" : "none";
-  }
-
-  function frameWrapIsOpen() {
-    return frameEl && frameEl.classList && frameEl.classList.contains("open");
-  }
-
   function updateWidgetPosition() {
     applyPositionTo(btn, { yLift: 0 });
 
@@ -305,8 +272,6 @@
     // offset.y가 string이면 보정 계산(100 - offset.y)을 못하므로 그냥 70/100 고정 보정만 적용
     var lift = isExpanded ? 100 : 70;
     applyPositionTo(frameEl, { yLift: lift });
-
-    updateExpandTogglePosition();
   }
 
   // ===== 크기 반영 =====
@@ -336,7 +301,6 @@
       frameEl.style.width = currentSize.width + "px";
       frameEl.style.height = currentSize.height + "px";
     }
-    updateExpandTogglePosition();
   }
 
   // ===== 세션/하트비트 =====
@@ -415,10 +379,6 @@
     frameEl.classList.remove("closing");
     frameEl.classList.add("open");
 
-    if (!isMobile() && expandToggle) {
-      expandToggle.style.display = "flex";
-      updateExpandTogglePosition();
-    }
     if (isMobile()) {
       lockScrollMobile();
       mobClose.classList.add("open");
@@ -445,8 +405,6 @@
 
     // 닫힘 애니메이션
     frameEl.classList.add("closing");
-
-    if (expandToggle) expandToggle.style.display = "none";
 
     // transitionend 누락 대비 fallback
     var done = false;
@@ -574,28 +532,6 @@
     });
     document.body.appendChild(mobClose);
 
-    // 데스크탑 패널 우측 상단 확장/축소 버튼
-    var fullscreenIcon =
-      '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.1465 13.1465C10.3417 12.9512 10.6583 12.9512 10.8535 13.1465C11.0488 13.3417 11.0488 13.6583 10.8535 13.8535L7.70703 17H10.5C10.7761 17 11 17.2239 11 17.5C11 17.7761 10.7761 18 10.5 18H6.5C6.22386 18 6 17.7761 6 17.5V13.5C6 13.2239 6.22386 13 6.5 13C6.77614 13 7 13.2239 7 13.5V16.293L10.1465 13.1465ZM17.5 6C17.7761 6 18 6.22386 18 6.5V10.5C18 10.7761 17.7761 11 17.5 11C17.2239 11 17 10.7761 17 10.5V7.70703L13.8535 10.8535C13.6583 11.0488 13.3417 11.0488 13.1465 10.8535C12.9512 10.6583 12.9512 10.3417 13.1465 10.1465L16.293 7H13.5C13.2239 7 13 6.77614 13 6.5C13 6.22386 13.2239 6 13.5 6H17.5Z" fill="#FFFFFF"/></svg>';
-    var fullscreenExitIcon =
-      '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.5 13C10.7761 13 11 13.2239 11 13.5V17.5C11 17.7761 10.7761 18 10.5 18C10.2239 18 10 17.7761 10 17.5V14.707L6.85352 17.8535C6.65825 18.0488 6.34175 18.0488 6.14648 17.8535C5.95122 17.6583 5.95122 17.3417 6.14648 17.1465L9.29297 14H6.5C6.22386 14 6 13.7761 6 13.5C6 13.2239 6.22386 13 6.5 13H10.5ZM17.1465 6.14648C17.3417 5.95122 17.6583 5.95122 17.8535 6.14648C18.0488 6.34175 18.0488 6.65825 17.8535 6.85352L14.707 10H17.5C17.7761 10 18 10.2239 18 10.5C18 10.7761 17.7761 11 17.5 11H13.5C13.2239 11 13 10.7761 13 10.5V6.5C13 6.22386 13.2239 6 13.5 6C13.7761 6 14 6.22386 14 6.5V9.29297L17.1465 6.14648Z" fill="#FFFFFF"/></svg>';
-
-    expandToggle = document.createElement("button");
-    expandToggle.className = "mycbw-expand-toggle";
-    expandToggle.setAttribute("aria-label", "확대");
-    expandToggle.innerHTML = fullscreenIcon;
-    expandToggle.addEventListener("pointerup", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (isMobile()) return;
-      isExpanded = !isExpanded;
-      updateWidgetSize();
-      expandToggle.setAttribute("aria-label", isExpanded ? "축소" : "확대");
-      expandToggle.innerHTML = isExpanded ? fullscreenExitIcon : fullscreenIcon;
-      updateExpandTogglePosition();
-    });
-    document.body.appendChild(expandToggle);
-
     // 오버레이 (바깥 클릭 닫기)
     overlay = document.createElement("div");
     overlay.className = "mycbw-overlay";
@@ -688,14 +624,6 @@
       resizeTimeout = setTimeout(function () {
         updateWidgetSize();
         updateWidgetPosition();
-        if (expandToggle) {
-          if (isOpen && !isMobile()) {
-            expandToggle.style.display = "flex";
-            updateExpandTogglePosition();
-          } else {
-            expandToggle.style.display = "none";
-          }
-        }
         if (isOpen && isMobile()) {
           lockScrollMobile();
           mobClose.classList.add("open");
@@ -733,9 +661,6 @@
     } catch (_) {}
     try {
       frameEl && frameEl.remove();
-    } catch (_) {}
-    try {
-      expandToggle && expandToggle.remove();
     } catch (_) {}
     try {
       document.querySelector(".mycbw-mob-close") &&
