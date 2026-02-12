@@ -38,17 +38,14 @@
     y: (cfg.anchor && cfg.anchor.y) || "bottom", // "top" | "bottom"
   };
   var offset = {
-    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "1.4rem",
-    y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : "9rem",
+    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "1.1rem",
+    y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : "4rem",
   };
 
-  // 버튼/패널 기본 크기
-  // - width: 기존 기본 500 유지
-  // - height: (viewport 높이 - 300) 를 기본값으로 사용, 최소/최대는 적당히 클램프
+  // 버튼/패널 기본 크기램프
   function getDefaultDesktopHeight() {
     var vh = window.innerHeight || document.documentElement.clientHeight || 0;
-    // 기본: vh - 300, 너무 작아지지 않게 최소 480, 너무 커지지 않게 최대 vh - 40
-    var h = vh - 300;
+    var h = vh - 250;
     var minH = 480;
     var maxH = Math.max(minH, vh - 40);
     return Math.max(minH, Math.min(h, maxH));
