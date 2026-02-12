@@ -278,7 +278,7 @@
     // 패널(frameEl) 위치 기준으로 "패널 안쪽 우측 상단"에 붙이기
     var rect = frameEl.getBoundingClientRect();
 
-    var inset = -10; // 패널 안쪽 여백(px)
+    var inset = 0; // 패널 안쪽 여백(px)
     var top = rect.top + inset;
     var right =
       (window.innerWidth || document.documentElement.clientWidth || 0) -
