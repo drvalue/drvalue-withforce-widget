@@ -38,8 +38,8 @@
     y: (cfg.anchor && cfg.anchor.y) || "bottom", // "top" | "bottom"
   };
   var offset = {
-    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : 20,
-    y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : 20,
+    x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "calc(100% - 5rem)",
+    y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : "10rem",
   };
 
   // 버튼/패널 기본 크기
