@@ -45,7 +45,7 @@
   // 버튼/패널 기본 크기램프
   function getDefaultDesktopHeight() {
     var vh = window.innerHeight || document.documentElement.clientHeight || 0;
-    var h = vh - 250;
+    var h = vh - 150;
     var minH = 480;
     var maxH = Math.max(minH, vh - 40);
     return Math.max(minH, Math.min(h, maxH));
@@ -218,6 +218,7 @@
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
         padding: 0;
+        backdrop-filter: blur(4px);
       }
       .mycbw-expand-toggle svg { width: 24px; height: 24px; }
 
@@ -267,18 +268,29 @@
   // 데스크탑 패널 우측 상단 확장/축소 버튼 위치
   function updateExpandTogglePosition() {
     if (!expandToggle || !frameWrapIsOpen()) return;
+
+    // 모바일은 숨김 유지
     if (isMobile()) {
       expandToggle.style.display = "none";
       return;
     }
+
+    // 패널(frameEl) 위치 기준으로 "패널 안쪽 우측 상단"에 붙이기
     var rect = frameEl.getBoundingClientRect();
-    expandToggle.style.position = "fixed";
-    var panelRightGap =
+
+    var inset = 16; // 패널 안쪽 여백(px)
+    var top = rect.top + inset;
+    var right =
       (window.innerWidth || document.documentElement.clientWidth || 0) -
-      rect.right;
-    expandToggle.style.top = rect.top + 35 + "px";
-    expandToggle.style.right = panelRightGap + 35 + "px";
+      rect.right +
+      inset;
+
+    expandToggle.style.position = "fixed";
+    expandToggle.style.top = top + "px";
+    expandToggle.style.right = right + "px";
     expandToggle.style.left = "auto";
+    expandToggle.style.bottom = "auto";
+
     expandToggle.style.display = isOpen ? "flex" : "none";
   }
 
