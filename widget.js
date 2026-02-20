@@ -12,7 +12,7 @@
   window[FLAG] = { version: VERSION };
 
   var cfg = window.MyChatbotWidget || {};
-  var botUrl = cfg.url || "https://workspace.growxd.com/withforce/chat/home";
+  var botUrl = "https://workspace.growxd.com/withforce/chat/home";
 
   var allowedOrigins = Array.isArray(cfg.allowedOrigins)
     ? cfg.allowedOrigins
