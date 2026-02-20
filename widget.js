@@ -118,7 +118,7 @@
 
       .mycbw-btn {
         position: fixed; width: 60px; height: 60px; border-radius: 50%;
-        background: #1b64b8;
+        background: linear-gradient(116deg, #f7fbff 50%, #1b64b8 90%);
         color: #fff; display: flex; align-items: center; justify-content: center;
         cursor: pointer; z-index: 10000000; box-shadow: 0 4px 12px rgba(0,0,0,.2);
         font-size: 24px; font-family: Arial, sans-serif;
