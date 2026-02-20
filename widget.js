@@ -300,27 +300,6 @@
     return iframeEl && iframeEl.contentWindow ? iframeEl.contentWindow : null;
   }
 
-  function hardResetIframeToHome() {
-    if (!iframeEl) return;
-    try {
-      var cur = new URL(iframeEl.src, location.href).href;
-      var home = new URL(botUrl, location.href).href;
-      if (cur === home) {
-        iframeEl.src = "about:blank";
-        setTimeout(function () {
-          iframeEl.src = botUrl;
-        }, 0);
-      } else {
-        iframeEl.src = botUrl;
-      }
-    } catch (_) {
-      iframeEl.src = "about:blank";
-      setTimeout(function () {
-        iframeEl.src = botUrl;
-      }, 0);
-    }
-  }
-
   function rebuildIframeToHome() {
     if (!frameEl) return;
 
@@ -333,6 +312,11 @@
     iframeEl.setAttribute(
       "allow",
       "clipboard-read; clipboard-write; microphone; camera"
+    );
+
+    iframeEl.setAttribute(
+      "sandbox",
+      "allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
     );
 
     iframeEl.src = botUrl + "?_wts=" + Date.now() + "#/home";
@@ -624,7 +608,10 @@
       var d = e.data;
 
       if (botOrigin !== "*") {
-        var ok = allowedOrigins.includes(e.origin);
+        var fromOurIframe = e.source === frameWindow();
+        var ok =
+          allowedOrigins.includes(e.origin) ||
+          (fromOurIframe && e.origin === "null");
         if (!ok) return;
       }
 
