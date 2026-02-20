@@ -63,7 +63,7 @@
     updateWidgetPosition();
   };
 
-  var btn, overlay, frameEl, mobClose;
+  var btn, overlay, frameEl, mobClose, iframeEl;
   var swallowNextBtnClick = false;
   var isOpen = false;
 
@@ -297,9 +297,28 @@
   }
 
   function frameWindow() {
-    var iframe =
-      frameEl && frameEl.querySelector && frameEl.querySelector("iframe");
-    return iframe && iframe.contentWindow ? iframe.contentWindow : null;
+    return iframeEl && iframeEl.contentWindow ? iframeEl.contentWindow : null;
+  }
+
+  function hardResetIframeToHome() {
+    if (!iframeEl) return;
+    try {
+      var cur = new URL(iframeEl.src, location.href).href;
+      var home = new URL(botUrl, location.href).href;
+      if (cur === home) {
+        iframeEl.src = "about:blank";
+        setTimeout(function () {
+          iframeEl.src = botUrl;
+        }, 0);
+      } else {
+        iframeEl.src = botUrl;
+      }
+    } catch (_) {
+      iframeEl.src = "about:blank";
+      setTimeout(function () {
+        iframeEl.src = botUrl;
+      }, 0);
+    }
   }
 
   var heartbeatId = null;
@@ -342,6 +361,7 @@
 
   function openPanel() {
     if (isOpen) return;
+    hardResetIframeToHome();
     isOpen = true;
 
     btn.classList.add("open");
@@ -387,6 +407,7 @@
       frameEl.classList.remove("closing");
       overlay.classList.remove("open");
       frameEl.removeEventListener("transitionend", onEnd);
+      hardResetIframeToHome();
     };
 
     var onEnd = function (ev) {
@@ -520,15 +541,15 @@
     frameEl = document.createElement("div");
     frameEl.className = "mycbw-frame-wrap";
 
-    var iframe = document.createElement("iframe");
-    iframe.className = "mycbw-frame";
-    iframe.setAttribute(
+    iframeEl = document.createElement("iframe");
+    iframeEl.className = "mycbw-frame";
+    iframeEl.setAttribute(
       "allow",
       "clipboard-read; clipboard-write; microphone; camera"
     );
-    iframe.src = botUrl;
+    iframeEl.src = botUrl;
 
-    frameEl.appendChild(iframe);
+    frameEl.appendChild(iframeEl);
     document.body.appendChild(frameEl);
 
     updateWidgetSize();
@@ -604,7 +625,7 @@
       stopHeartbeat();
     });
 
-    iframe.addEventListener("load", function () {});
+    iframeEl.addEventListener("load", function () {});
   }
 
   window[FLAG].teardown = function () {
