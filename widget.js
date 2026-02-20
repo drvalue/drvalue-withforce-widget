@@ -2,7 +2,6 @@
   const FLAG = "__DRVALUE_WITHFORCE_WIDGET__";
   const VERSION = "2026/02/12:stable";
 
-  // ===== 재실행 시 정리 =====
   if (window[FLAG]?.teardown) {
     try {
       window[FLAG].teardown();
@@ -12,13 +11,9 @@
   }
   window[FLAG] = { version: VERSION };
 
-  // ===== 설정/기본값 =====
   var cfg = window.MyChatbotWidget || {};
   var botUrl = cfg.url || "https://workspace.growxd.com/withforce/chat/home";
 
-  // postMessage 허용 origin (보안 필수)
-  // - 기본: botUrl origin만 허용
-  // - 어드민/별도 도메인에서 WIDGET_CONFIG를 보내야 하면 cfg.allowedOrigins에 추가
   var allowedOrigins = Array.isArray(cfg.allowedOrigins)
     ? cfg.allowedOrigins
     : [];
@@ -32,17 +27,15 @@
     allowedOrigins.unshift(botOrigin);
   }
 
-  // 위치 제어용 상태 (기본: 오른쪽-하단 20px)
   var anchor = {
-    x: (cfg.anchor && cfg.anchor.x) || "right", // "left" | "right"
-    y: (cfg.anchor && cfg.anchor.y) || "bottom", // "top" | "bottom"
+    x: (cfg.anchor && cfg.anchor.x) || "right",
+    y: (cfg.anchor && cfg.anchor.y) || "bottom",
   };
   var offset = {
     x: cfg.offset && cfg.offset.x != null ? cfg.offset.x : "1.1rem",
     y: cfg.offset && cfg.offset.y != null ? cfg.offset.y : "4rem",
   };
 
-  // 버튼/패널 기본 크기램프
   function getDefaultDesktopHeight() {
     var vh = window.innerHeight || document.documentElement.clientHeight || 0;
     var h = vh - 150;
@@ -59,11 +52,9 @@
         : getDefaultDesktopHeight(),
   };
 
-  // 데스크톱 패널 확장 상태 및 크기
   var isExpanded = false;
   var currentSize = getResponsiveSize();
 
-  // ===== 전역 노출 API (대시보드/콘솔에서 호출 가능) =====
   window[FLAG].setPosition = function (next) {
     if (next && next.anchor) anchor = Object.assign({}, anchor, next.anchor);
     if (next && next.offset) offset = Object.assign({}, offset, next.offset);
@@ -72,17 +63,14 @@
     updateWidgetPosition();
   };
 
-  // ===== DOM refs =====
   var btn, overlay, frameEl, mobClose;
   var swallowNextBtnClick = false;
   var isOpen = false;
 
-  // ===== 유틸 =====
   function isMobile() {
     return window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
   }
 
-  // 데스크톱/모바일 반응형 크기 계산
   function getResponsiveSize() {
     var w = window.innerWidth || document.documentElement.clientWidth || 0;
     var h = window.innerHeight || document.documentElement.clientHeight || 0;
@@ -104,7 +92,6 @@
     }
   }
 
-  // ===== 스타일 주입 =====
   function injectStyles() {
     if (document.getElementById("mycbw-style")) return;
     var style = document.createElement("style");
@@ -118,7 +105,7 @@
 
       .mycbw-btn {
         position: fixed; width: 60px; height: 60px; border-radius: 50%;
-        background: linear-gradient(116deg, #05A3E7 50%, #1b64b8 90%);
+        background: linear-gradient(116deg, #BFEA6B 0%, #90c31f 55%, #05A3E7 82%, #1b64b8 100%);
         color: #fff; display: flex; align-items: center; justify-content: center;
         cursor: pointer; z-index: 10000000; box-shadow: 0 4px 12px rgba(0,0,0,.2);
         font-size: 24px; font-family: Arial, sans-serif;
@@ -139,7 +126,6 @@
         }
       }
 
-      /* overlay: 바깥 클릭 닫기용 (open일 때만 pointer-events 활성화) */
       .mycbw-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.0);
         opacity: 0; visibility: hidden; pointer-events: none;
@@ -147,7 +133,6 @@
       }
       .mycbw-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
 
-      /* iframe wrapper (safe-area padding은 wrapper에서 처리) */
       .mycbw-frame-wrap {
         position: fixed;
         z-index: 2147483646;
@@ -229,7 +214,6 @@
     document.head.appendChild(style);
   }
 
-  // ===== 위치 적용 =====
   function toCssLen(v) {
     if (typeof v === "number") return v + "px";
     if (typeof v === "string") return v;
@@ -248,12 +232,10 @@
     extra = extra || { yLift: 0 };
     el.style.left = el.style.right = el.style.top = el.style.bottom = "";
 
-    // X축
     var xCss = toCssLen(offset.x);
     if (anchor.x === "left") el.style.left = xCss || "20px";
     else el.style.right = xCss || "20px";
 
-    // Y축
     var lift = extra.yLift || 0;
     var yCss = applyYWithLift(offset.y, lift);
     if (anchor.y === "top") el.style.top = yCss;
@@ -262,12 +244,10 @@
 
   function updateWidgetPosition() {
     applyPositionTo(btn, { yLift: 0 });
-
     var lift = isExpanded ? 100 : 70;
     applyPositionTo(frameEl, { yLift: lift });
   }
 
-  // ===== 크기 반영 =====
   function updateWidgetSize() {
     var base = getResponsiveSize();
     if (isMobile()) {
@@ -296,7 +276,6 @@
     }
   }
 
-  // ===== 세션/하트비트 =====
   function getSession() {
     var m = document.cookie.match(/(?:^|;\s*)PHPSESSID=([^;]+)/);
     return m ? m[1] : null;
@@ -345,7 +324,6 @@
     heartbeatStarted = false;
   }
 
-  // ===== 열기/닫기 =====
   function lockScrollMobile() {
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
@@ -392,19 +370,15 @@
     btn.classList.remove("open");
     btn.setAttribute("aria-expanded", "false");
 
-    // 확장 초기화
     isExpanded = false;
     updateWidgetSize();
 
-    // 모바일 스크롤 리셋
     unlockScrollMobile();
     mobClose.classList.remove("open");
     mobClose.style.display = "none";
 
-    // 닫힘 애니메이션
     frameEl.classList.add("closing");
 
-    // transitionend 누락 대비 fallback
     var done = false;
     var finish = function () {
       if (done) return;
@@ -424,7 +398,6 @@
     setTimeout(finish, 450);
   }
 
-  // ===== 외부에서 호출할 수 있게 API 노출 =====
   window[FLAG].open = function () {
     openPanel();
   };
@@ -435,14 +408,12 @@
     isOpen ? closePanel() : openPanel();
   };
 
-  // ===== 원격 설정(fetch) (선택) =====
   function fetchWidgetPosition() {
-    // 사용자가 구현 안 했으면 조용히 무시
     if (typeof cfg.fetchPosition !== "function") return;
 
     Promise.resolve()
       .then(function () {
-        return cfg.fetchPosition(); // { anchor, offset, size } 리턴 기대
+        return cfg.fetchPosition();
       })
       .then(function (res) {
         if (!res) return;
@@ -457,11 +428,9 @@
       });
   }
 
-  // ===== 메인 런 =====
   function run() {
     injectStyles();
 
-    // 버튼
     btn = document.createElement("div");
     btn.className = "mycbw-btn";
     btn.setAttribute("role", "button");
@@ -483,7 +452,7 @@
           </linearGradient>
 
           <linearGradient id="shineGrad" x1="8" y1="12" x2="22" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.60"/>
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
           </linearGradient>
         </defs>
@@ -501,7 +470,6 @@
     `;
     document.body.appendChild(btn);
 
-    // 버튼 내부 클로즈(작은 X)
     var btnClose = document.createElement("div");
     btnClose.className = "mycbw-btn-close";
     btnClose.innerHTML = "&times;";
@@ -512,7 +480,7 @@
       width: "20px",
       height: "20px",
       borderRadius: "6px",
-      background: "linear-gradient(116deg, #717BBC 50%, #1b64b8 90%)",
+      background: "linear-gradient(116deg, #05A3E7 35%, #1b64b8 100%)",
       color: "white",
       fontSize: "20px",
       display: "none",
@@ -529,7 +497,6 @@
     });
     btn.appendChild(btnClose);
 
-    // 모바일 상단 닫기 버튼
     mobClose = document.createElement("button");
     mobClose.className = "mycbw-mob-close";
     mobClose.setAttribute("aria-label", "닫기");
@@ -542,7 +509,6 @@
     mobClose.style.display = "none";
     document.body.appendChild(mobClose);
 
-    // 오버레이 (바깥 클릭 닫기)
     overlay = document.createElement("div");
     overlay.className = "mycbw-overlay";
     overlay.addEventListener("pointerup", function (e) {
@@ -551,11 +517,9 @@
     });
     document.body.appendChild(overlay);
 
-    // 패널 wrapper
     frameEl = document.createElement("div");
     frameEl.className = "mycbw-frame-wrap";
 
-    // 실제 iframe
     var iframe = document.createElement("iframe");
     iframe.className = "mycbw-frame";
     iframe.setAttribute(
@@ -567,14 +531,11 @@
     frameEl.appendChild(iframe);
     document.body.appendChild(frameEl);
 
-    // 최초 크기/위치 적용
     updateWidgetSize();
     updateWidgetPosition();
 
-    // API에서 위치 정보 가져오기 (선택)
     fetchWidgetPosition();
 
-    // 키보드 접근성
     btn.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -582,7 +543,6 @@
       }
     });
 
-    // 클릭/터치 통합: pointerup 하나로 처리
     btn.addEventListener("pointerup", function (e) {
       if (swallowNextBtnClick) {
         swallowNextBtnClick = false;
@@ -597,11 +557,9 @@
       if (e.key === "Escape") closePanel();
     });
 
-    // postMessage 수신 (보안: allowlist 기반)
     window.addEventListener("message", function (e) {
       var d = e.data;
 
-      // allowlist 체크
       if (botOrigin !== "*") {
         var ok = allowedOrigins.includes(e.origin);
         if (!ok) return;
@@ -624,7 +582,6 @@
       }
     });
 
-    // 리사이즈: 크기 + 위치 재적용
     var resizeTimeout;
     window.addEventListener("resize", function () {
       clearTimeout(resizeTimeout);
@@ -643,18 +600,13 @@
       }, 200);
     });
 
-    // 페이지 이탈 시 하트비트 정리
     window.addEventListener("beforeunload", function () {
       stopHeartbeat();
     });
 
-    // iframe 로드
-    iframe.addEventListener("load", function () {
-      // no-op
-    });
+    iframe.addEventListener("load", function () {});
   }
 
-  // teardown
   window[FLAG].teardown = function () {
     try {
       clearInterval(window[FLAG]._hb);
