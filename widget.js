@@ -472,18 +472,18 @@
       <svg style="position:relative; top:-5px;" width="40" height="40" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="bodyGrad" x1="6" y1="10" x2="26" y2="29" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
-            <stop offset="45%" stop-color="#DCEBFF" stop-opacity="0.95"/>
-            <stop offset="100%" stop-color="#7FB6FF" stop-opacity="0.95"/>
+            <stop offset="0%" stop-color="#F2FFD8" stop-opacity="0.98"/>
+            <stop offset="40%" stop-color="#BFEA6B" stop-opacity="0.98"/>
+            <stop offset="100%" stop-color="#90c31f" stop-opacity="0.98"/>
           </linearGradient>
 
           <linearGradient id="headGrad" x1="12" y1="1" x2="18" y2="8" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#BFFF3B"/>
-            <stop offset="100%" stop-color="#67E389"/>
+            <stop offset="0%" stop-color="#D9FF7A"/>
+            <stop offset="100%" stop-color="#90c31f"/>
           </linearGradient>
 
           <linearGradient id="shineGrad" x1="8" y1="12" x2="22" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.60"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
           </linearGradient>
         </defs>
