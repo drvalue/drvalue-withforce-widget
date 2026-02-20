@@ -12,7 +12,7 @@
   window[FLAG] = { version: VERSION };
 
   var cfg = window.MyChatbotWidget || {};
-  var botUrl = "https://workspace.growxd.com/withforce/chat/home";
+  var botUrl = cfg.url || "https://workspace.growxd.com/withforce/chat/home";
 
   var allowedOrigins = Array.isArray(cfg.allowedOrigins)
     ? cfg.allowedOrigins
@@ -63,7 +63,7 @@
     updateWidgetPosition();
   };
 
-  var btn, overlay, frameEl, mobClose, iframeEl;
+  var btn, overlay, frameEl, mobClose;
   var swallowNextBtnClick = false;
   var isOpen = false;
 
@@ -297,42 +297,9 @@
   }
 
   function frameWindow() {
-    return iframeEl && iframeEl.contentWindow ? iframeEl.contentWindow : null;
-  }
-
-  function rebuildIframeToHome() {
-    if (!frameEl) return;
-
-    try {
-      if (iframeEl) iframeEl.remove();
-    } catch (_) {}
-
-    iframeEl = document.createElement("iframe");
-    iframeEl.className = "mycbw-frame";
-    iframeEl.setAttribute(
-      "allow",
-      "clipboard-read; clipboard-write; microphone; camera"
-    );
-
-    iframeEl.setAttribute(
-      "sandbox",
-      "allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
-    );
-
-    iframeEl.src = botUrl + "?_wts=" + Date.now() + "#/home";
-
-    frameEl.appendChild(iframeEl);
-  }
-
-  function ensureHomeIframe() {
-    try {
-      if (!iframeEl) return rebuildIframeToHome();
-      var want = new URL(botUrl, location.href).origin;
-      var cur = new URL(iframeEl.src || "", location.href).origin;
-      if (cur !== want) return rebuildIframeToHome();
-    } catch (_) {
-      return rebuildIframeToHome();
-    }
+    var iframe =
+      frameEl && frameEl.querySelector && frameEl.querySelector("iframe");
+    return iframe && iframe.contentWindow ? iframe.contentWindow : null;
   }
 
   var heartbeatId = null;
@@ -375,7 +342,7 @@
 
   function openPanel() {
     if (isOpen) return;
-    ensureHomeIframe();
+
     setTimeout(function () {
       try {
         var w = frameWindow();
@@ -431,7 +398,6 @@
       frameEl.classList.remove("closing");
       overlay.classList.remove("open");
       frameEl.removeEventListener("transitionend", onEnd);
-      rebuildIframeToHome();
     };
 
     var onEnd = function (ev) {
@@ -565,18 +531,16 @@
     frameEl = document.createElement("div");
     frameEl.className = "mycbw-frame-wrap";
 
-    // iframeEl = document.createElement("iframe");
-    // iframeEl.className = "mycbw-frame";
-    // iframeEl.setAttribute(
-    //   "allow",
-    //   "clipboard-read; clipboard-write; microphone; camera"
-    // );
-    // iframeEl.src = botUrl;
+    iframe = document.createElement("iframe");
+    iframe.className = "mycbw-frame";
+    iframe.setAttribute(
+      "allow",
+      "clipboard-read; clipboard-write; microphone; camera"
+    );
+    iframe.src = botUrl;
 
-    // frameEl.appendChild(iframeEl);
-    // document.body.appendChild(frameEl);
-
-    rebuildIframeToHome();
+    frameEl.appendChild(iframe);
+    document.body.appendChild(frameEl);
 
     updateWidgetSize();
     updateWidgetPosition();
@@ -608,23 +572,12 @@
       var d = e.data;
 
       if (botOrigin !== "*") {
-        var fromOurIframe = e.source === frameWindow();
-        var ok =
-          allowedOrigins.includes(e.origin) ||
-          (fromOurIframe && e.origin === "null");
+        var ok = allowedOrigins.includes(e.origin);
         if (!ok) return;
       }
 
       if (d && d.type === "WIDGET_READY") {
         if (heartbeatStarted) sendSession();
-        try {
-          var w = frameWindow();
-          if (w)
-            w.postMessage(
-              { type: "WIDGET_FORCE_HOME", url: botUrl },
-              botOrigin === "*" ? "*" : botOrigin
-            );
-        } catch (_) {}
       }
 
       if (d && d.type === "WIDGET_CONFIG" && d.payload) {
@@ -662,7 +615,7 @@
       stopHeartbeat();
     });
 
-    iframeEl.addEventListener("load", function () {});
+    iframe.addEventListener("load", function () {});
   }
 
   window[FLAG].teardown = function () {
