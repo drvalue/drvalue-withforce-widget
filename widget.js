@@ -321,6 +321,36 @@
     }
   }
 
+  function rebuildIframeToHome() {
+    if (!frameEl) return;
+
+    try {
+      if (iframeEl) iframeEl.remove();
+    } catch (_) {}
+
+    iframeEl = document.createElement("iframe");
+    iframeEl.className = "mycbw-frame";
+    iframeEl.setAttribute(
+      "allow",
+      "clipboard-read; clipboard-write; microphone; camera"
+    );
+
+    iframeEl.src = botUrl + "?_wts=" + Date.now() + "#/home";
+
+    frameEl.appendChild(iframeEl);
+  }
+
+  function ensureHomeIframe() {
+    try {
+      if (!iframeEl) return rebuildIframeToHome();
+      var want = new URL(botUrl, location.href).origin;
+      var cur = new URL(iframeEl.src || "", location.href).origin;
+      if (cur !== want) return rebuildIframeToHome();
+    } catch (_) {
+      return rebuildIframeToHome();
+    }
+  }
+
   var heartbeatId = null;
   var heartbeatStarted = false;
 
@@ -361,7 +391,17 @@
 
   function openPanel() {
     if (isOpen) return;
-    hardResetIframeToHome();
+    ensureHomeIframe();
+    setTimeout(function () {
+      try {
+        var w = frameWindow();
+        if (!w) return;
+        w.postMessage(
+          { type: "WIDGET_FORCE_HOME", url: botUrl },
+          botOrigin === "*" ? "*" : botOrigin
+        );
+      } catch (_) {}
+    }, 0);
     isOpen = true;
 
     btn.classList.add("open");
@@ -407,7 +447,7 @@
       frameEl.classList.remove("closing");
       overlay.classList.remove("open");
       frameEl.removeEventListener("transitionend", onEnd);
-      hardResetIframeToHome();
+      rebuildIframeToHome();
     };
 
     var onEnd = function (ev) {
@@ -541,16 +581,18 @@
     frameEl = document.createElement("div");
     frameEl.className = "mycbw-frame-wrap";
 
-    iframeEl = document.createElement("iframe");
-    iframeEl.className = "mycbw-frame";
-    iframeEl.setAttribute(
-      "allow",
-      "clipboard-read; clipboard-write; microphone; camera"
-    );
-    iframeEl.src = botUrl;
+    // iframeEl = document.createElement("iframe");
+    // iframeEl.className = "mycbw-frame";
+    // iframeEl.setAttribute(
+    //   "allow",
+    //   "clipboard-read; clipboard-write; microphone; camera"
+    // );
+    // iframeEl.src = botUrl;
 
-    frameEl.appendChild(iframeEl);
-    document.body.appendChild(frameEl);
+    // frameEl.appendChild(iframeEl);
+    // document.body.appendChild(frameEl);
+
+    rebuildIframeToHome();
 
     updateWidgetSize();
     updateWidgetPosition();
@@ -588,6 +630,14 @@
 
       if (d && d.type === "WIDGET_READY") {
         if (heartbeatStarted) sendSession();
+        try {
+          var w = frameWindow();
+          if (w)
+            w.postMessage(
+              { type: "WIDGET_FORCE_HOME", url: botUrl },
+              botOrigin === "*" ? "*" : botOrigin
+            );
+        } catch (_) {}
       }
 
       if (d && d.type === "WIDGET_CONFIG" && d.payload) {
