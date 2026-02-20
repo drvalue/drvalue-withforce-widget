@@ -105,7 +105,7 @@
 
       .mycbw-btn {
         position: fixed; width: 60px; height: 60px; border-radius: 50%;
-        background: linear-gradient(116deg, #BFEA6B 0%, #90c31f 55%, #05A3E7 82%, #1b64b8 100%);
+        background: linear-gradient(116deg, #05A3E7 20%, #1b64b8 85%);
         color: #fff; display: flex; align-items: center; justify-content: center;
         cursor: pointer; z-index: 10000000; box-shadow: 0 4px 12px rgba(0,0,0,.2);
         font-size: 24px; font-family: Arial, sans-serif;
@@ -452,7 +452,7 @@
           </linearGradient>
 
           <linearGradient id="shineGrad" x1="8" y1="12" x2="22" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
           </linearGradient>
         </defs>
@@ -480,7 +480,7 @@
       width: "20px",
       height: "20px",
       borderRadius: "6px",
-      background: "linear-gradient(116deg, #05A3E7 35%, #1b64b8 100%)",
+      background: "linear-gradient(116deg, #05A3E7 20%, #1b64b8 90%)",
       color: "white",
       fontSize: "20px",
       display: "none",
